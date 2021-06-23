@@ -1,0 +1,99 @@
+//Parameters origin
+verbosity = 0;
+real h=0.012;    real delta=2;  real epsilon=0.3;   real rho=370;   real lamda=2.5*1e^(6);
+real kq=0.65;    real km=2.2*1e^(-8);  real cm=0.01;  real cq=2500;   real hq=22.5;
+real hm=2.5*1e^(-6);  real T0=10;   real Ta=110;  real U0=86;   real Ua=4;
+
+// Parametrers of nomenclature
+real am=km/(rho*cq);  real aq=kq/(rho*cq);  real Bim=(hm*h)/km;   real Biq=(hq*h)/kq;
+real K0=(lamda*cm*(U0-Ua))/(cq*(Ta-T0));    real Lu=am/aq;
+real Pn=(delta*(Ta-T0))/(cq*(U0-Ua));       real dt=0.01;
+
+// Parameters of formulation
+
+real alpha1=1+epsilon*K0*Lu*Pn;     real alpha2=epsilon*K0*Lu;
+real beta1=Lu*Pn;                   real beta2=Lu;
+real gama1=Biq;                     real gama2=Pn;
+real sigma1=(1-epsilon)*K0*Lu*Bim;  real sigma2=Bim;
+
+//Constants of formulation
+real CT1=-dt*alpha1;    real CT2=-1;    real CT3=dt*gama1*(alpha2*gama2-alpha1);
+real CP1=-dt*beta2;     real CP2=-1;    real CP3=dt*(sigma1*(beta2*gama2-beta1)-beta2*sigma2);
+real CPT1=dt*alpha2;                    real CPT2=dt*(alpha2*sigma2+sigma1*(alpha1-alpha2*gama2));
+real CTP1=dt*beta1;                     real CTP2=dt*gama1*(beta1-beta2*gama2);
+real MT1=-1;                            real MT2=dt*((alpha2*gama2-alpha1)*(gama1-sigma1)+alpha2*sigma2);
+real MP1=-1;                            real MP2=dt*((beta1-beta2*sigma2)*(gama1-sigma1)-beta2*sigma2);
+
+//mesh
+mesh Th=square(10,10);
+
+// fespace
+fespace Vh(Th, P2);
+Vh T, vT, DT;
+Vh p, vp, DP;
+Vh Temp, U;
+
+//macro
+macro Grad(T) [dx(T),dy(T)]//
+
+// problem
+problem luikov ([T, p], [vT, vp])
+        =int2d(Th)(
+            CT1*Grad(T)' *Grad(vT)
+            )
+            +int2d(Th)(
+              CT2*T*vT
+              )
+            +int2d(Th)(
+              CPT1*Grad(p)' *Grad(vT)
+              )
+            +int2d(Th)(
+              CP1*Grad(p)' *Grad(vp)
+              )
+            +int2d(Th)(
+              CP2*p*vp
+              )
+            +int2d(Th)(
+              CTP1*Grad(p)' *Grad(vp)
+              )
+            -int2d(Th)(
+              MT1*DT*vT
+              )
+            -int2d(Th)(
+              MP1*DP*vp
+              )
+            +int1d(Th, 1,2,3,4)(
+              CT3*T*vT
+              )
+            +int1d(Th, 1,2,3,4)(
+              CP3*p*vp
+              )
+            +int1d(Th, 1,2,3,4)(
+              CPT2*p*vT
+              )
+            +int1d(Th, 1,2,3,4)(
+              CTP2*T*vp
+              )
+            -int1d(Th, 1,2,3,4)(
+              MT2*vT
+              )
+            -int1d(Th, 1,2,3,4)(
+              MP2*vp
+              )
+              ;
+real t=0;
+DT=0;
+DP=0;
+for (int m=0; m <= 5/dt; m++){
+  //Update
+  t=t+dt;
+  DT=T;
+  DP=p;
+  //Solve
+  luikov;
+  Temp=T*(Ta-T0)+T0;
+  U=U0-p*(U0-Ua);
+  //Plot
+  plot(Temp, wait=true, WindowIndex=0, fill=true, dim=3, cmm="Temperature t="+m);
+  plot(U, wait=true, WindowIndex=1, fill=true, dim=3, cmm="Moisture t= "+m );
+}D
