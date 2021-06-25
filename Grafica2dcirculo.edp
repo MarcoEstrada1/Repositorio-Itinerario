@@ -1,4 +1,5 @@
-//Parameters origin
+
+//Parameters originl
 verbosity = 0;
 real h=0.012;    real delta=2;  real epsilon=0.3;   real rho=370;   real lamda=2.5*1e^(6);
 real kq=0.65;    real km=2.2*1e^(-8);  real cm=0.01;  real cq=2500;   real hq=22.5;
@@ -25,7 +26,8 @@ real MT1=-1;                            real MT2=dt*((alpha2*gama2-alpha1)*(gama
 real MP1=-1;                            real MP2=dt*((beta1-beta2*sigma2)*(gama1-sigma1)-beta2*sigma2);
 
 //mesh
-mesh Th=square(10,10);
+border cc(t=0, 2*pi){x=cos(t); y=sin(t); label=1;}
+mesh Th=buildmesh(cc(100));
 
 // fespace
 fespace Vh(Th, P2);
@@ -94,6 +96,6 @@ for (int m=0; m <= 5/dt; m++){
   Temp=T*(Ta-T0)+T0;
   U=U0-p*(U0-Ua);
   //Plot
-  plot(Temp, wait=true, WindowIndex=0, fill=true, dim=3, cmm="Temperature t="+m);
-  plot(U, wait=true, WindowIndex=1, fill=true, dim=3, cmm="Moisture t= "+m );
+  plot(Temp, wait=true, WindowIndex=0, fill=true, dim=3, cmm="Temperature t="+m, value=true);
+  plot(U, wait=true, WindowIndex=1, fill=true, dim=3, cmm="Moisture t= "+m, value=true );
 }
