@@ -96,6 +96,6 @@ for (int m=0; m <= 5/dt; m++){
   Temp=T*(Ta-T0)+T0;
   U=U0-p*(U0-Ua);
   //Plot
-  plot(Temp, wait=true, WindowIndex=0, fill=true, dim=3, cmm="Temperature t="+m, value=true);
-  plot(U, wait=true, WindowIndex=1, fill=true, dim=3, cmm="Moisture t= "+m, value=true );
+  plot(Temp, wait=false, WindowIndex=0, fill=true, dim=3, cmm="Temperature t="+m, ps="Temperature2.eps", value=true, nbiso=15);
+  plot(U, wait=false, WindowIndex=1, fill=true, dim=3, cmm="Moisture t= "+m, ps="Moisure2.eps", value=true, nbiso=15 );
 }
