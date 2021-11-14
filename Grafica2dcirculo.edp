@@ -10,13 +10,17 @@ real am=km/(rho*cq);  real aq=kq/(rho*cq);  real Bim=(hm*h)/km;   real Biq=(hq*h
 real K0=(lamda*cm*(U0-Ua))/(cq*(Ta-T0));    real Lu=am/aq;
 real Pn=(delta*(Ta-T0))/(cq*(U0-Ua));       real dt=0.01;
 
+cout << "Pn = " << Pn << endl;
+cout << "k0 = " << K0 << endl;
+cout << "Bim = " << Bim << endl;
+cout << "Biq = " << Biq << endl;
+cout << "Lu = " << Lu << endl;
 // Parameters of formulation
 
 real alpha1=1+epsilon*K0*Lu*Pn;     real alpha2=epsilon*K0*Lu;
 real beta1=Lu*Pn;                   real beta2=Lu;
 real gama1=Biq;                     real gama2=Pn;
 real sigma1=(1-epsilon)*K0*Lu*Bim;  real sigma2=Bim;
-
 //Constants of formulation
 real CT1=-dt*alpha1;    real CT2=-1;    real CT3=dt*gama1*(alpha2*gama2-alpha1);
 real CP1=-dt*beta2;     real CP2=-1;    real CP3=dt*(sigma1*(beta2*gama2-beta1)-beta2*sigma2);
@@ -28,6 +32,7 @@ real MP1=-1;                            real MP2=dt*((beta1-beta2*sigma2)*(gama1
 //mesh
 border cc(t=0, 2*pi){x=cos(t); y=sin(t); label=1;}
 mesh Th=buildmesh(cc(100));
+plot(Th, wait=true, ps="Malla.eps");
 
 // fespace
 fespace Vh(Th, P2);
@@ -56,7 +61,7 @@ problem luikov ([T, p], [vT, vp])
               CP2*p*vp
               )
             +int2d(Th)(
-              CTP1*Grad(p)' *Grad(vp)
+              CTP1*Grad(T)' *Grad(vp)
               )
             -int2d(Th)(
               MT1*DT*vT

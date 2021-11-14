@@ -30,7 +30,7 @@ real MP1=-1;                            real MP2=dt*((beta1-beta2*sigma2)*(gama1
 mesh Th=square(10,10);
 
 // fespace
-fespace Vh(Th, P2);
+fespace Vh(Th, P1);
 Vh T, vT, DT;
 Vh p, vp, DP;
 Vh Temp, U;
@@ -93,12 +93,20 @@ for (int m=0; m <= 5/dt; m++){
   DP=p;
   //Solve
   luikov;
+  //Temp=T*(Ta-T0)+T0;
+  //U=U0-p*(U0-Ua);
+  //int[int] Order = [1];
+  //Plot
+  //string vtkOutputFile="/tmp/luikov/output.vtk";
+  //savevtk(vtkOutputFile, Th, Temp, dataname= "Temperatura-Humedad", order=Order);
+  //plot(Temp, wait=true, WindowIndex=0, fill=true, dim=3, cmm="Temperature t="+m);
+  //plot(U, wait=true, WindowIndex=1, fill=true, dim=3, cmm="Moisture t= "+m );
   Temp=T*(Ta-T0)+T0;
   U=U0-p*(U0-Ua);
   int[int] Order = [1];
-  //Plot
-  string vtkOutputFile="/tmp/luikov/output.vtk";
-  savevtk(vtkOutputFile, Th, Temp, dataname= "Temperatura-Humedad", order=Order);
-  //plot(Temp, wait=true, WindowIndex=0, fill=true, dim=3, cmm="Temperature t="+m);
-  //plot(U, wait=true, WindowIndex=1, fill=true, dim=3, cmm="Moisture t= "+m );
+  string DataName = "Temp";
+  savevtk("Temp.vtu", Th, Temp, dataname=DataName, order=Order);
+  int[int] Order2 = [1];
+  string DataName2 = "Moinsture";
+  savevtk("Moinsture.vtu", Th, U, dataname=DataName2, order=Order2);
 }

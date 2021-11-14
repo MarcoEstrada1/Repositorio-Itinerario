@@ -30,6 +30,7 @@ real MP1=-1;                            real MP2=dt*((beta1-beta2*sigma2)*(gama1
 real nn=10;
 int[int] labs = [1, 2, 2, 1, 1, 2];
 mesh3 Th=cube(nn, nn,nn, label=labs);
+plot(Th, wait=true,  ps="3Dmesh");
 
 // fespace
 fespace Vh(Th, P23d);
